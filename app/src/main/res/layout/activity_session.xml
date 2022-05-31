@@ -19,10 +19,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginButton" />
+        app:layout_constraintTop_toBottomOf="@+id/startChatButton" />
 
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/startChatButton"
         android:layout_width="wrap_content"
         android:layout_height="55dp"
         android:layout_marginTop="44dp"
@@ -99,10 +99,10 @@
         android:layout_height="wrap_content"
         android:elevation="100dp"
         android:src="@drawable/send_logo"
-        app:layout_constraintBottom_toBottomOf="@+id/loginButton"
-        app:layout_constraintEnd_toEndOf="@+id/loginButton"
-        app:layout_constraintStart_toStartOf="@+id/loginButton"
-        app:layout_constraintTop_toTopOf="@+id/loginButton"
+        app:layout_constraintBottom_toBottomOf="@+id/startChatButton"
+        app:layout_constraintEnd_toEndOf="@+id/startChatButton"
+        app:layout_constraintStart_toStartOf="@+id/startChatButton"
+        app:layout_constraintTop_toTopOf="@+id/startChatButton"
         app:layout_constraintVertical_bias="0.516" />
 
     <Button

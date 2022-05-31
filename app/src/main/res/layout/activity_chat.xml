@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_chat"
+    android:background="@color/bkg"
     tools:context=".ChatActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="374dp"
         android:layout_height="683dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,11 +19,11 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerMsgView"
             android:layout_width="357dp"
-            android:layout_height="497dp"
+            android:layout_height="450dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
-            android:background="@color/bkg_pale"
+            android:background="@drawable/shaping_plain_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,9 +37,10 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/shaping_plain_text"
             android:ems="10"
+            android:hint="Escribe un mensaje"
             android:inputType="textPersonName"
-            android:text="Escribe un mensaje"
             android:textColor="@color/pale_white_for_img"
+            android:textColorHint="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recyclerMsgView" />
 
@@ -65,6 +67,7 @@
                 android:id="@+id/imageView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:srcCompat="@drawable/cuervo_logo_png"
                 tools:src="@tools:sample/avatars" />
         </androidx.cardview.widget.CardView>
 

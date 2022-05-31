@@ -4,13 +4,19 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import com.icesi.savechat.databinding.ActivityLoginBinding
 import com.icesi.savechat.databinding.ActivitySessionBinding
+import com.icesi.savechat.model.Message
+import com.icesi.savechat.model.Nick
+import com.icesi.savechat.model.Session
 import com.icesi.savechat.model.User
 import java.security.SecureRandom
 import java.security.spec.KeySpec
@@ -34,23 +40,92 @@ class SessionActivity : AppCompatActivity() {
         binding = ActivitySessionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        var email: String = Firebase.auth.currentUser?.email.toString()
         binding.logOutButton.setOnClickListener {
             Firebase.auth.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
         }
 
-        var email: String = Firebase.auth.currentUser?.email.toString()
-
-        if ( Firebase.auth.currentUser.toString() == "null") {
+        if (Firebase.auth.currentUser.toString() == "null") {
             startActivity(Intent(this, LoginActivity::class.java))
         } else {
             Firebase.firestore.collection("users").document(email).get().addOnSuccessListener {
-                //currentUser = it.toObject(User::class.java)!!
+                currentUser = it.toObject(User::class.java)!!
                 binding.userNick.text = it.toObject(User::class.java)?.nick.toString()
-
             }
         }
+
+        binding.startChatButton.setOnClickListener {
+            var partnerEmail = binding.emailPartner.text.toString()
+            //var password = binding.passwordSesion.text.toString()
+            Firebase.firestore.collection("users")
+                .document(currentUser.email)
+                .collection("sessions")
+                .whereEqualTo("idPartner", partnerEmail)
+                .get()
+                .addOnSuccessListener {
+                    if (it.size() != 0) {
+                        var sessionInformation = it.documents.get(0).toObject(Session::class.java)
+                        goToChat(sessionInformation!!.idPartner, sessionInformation!!.idChat)
+                    } else {
+                        createNewSession(partnerEmail)
+                    }
+                }
+        }
     }
+
+    fun createNewSession(partnerEmail: String){
+        var idChat: String = UUID.randomUUID().toString()
+        Firebase.firestore.collection("users")
+            .document(currentUser.email)
+            .collection("sessions")
+            .document(partnerEmail)
+            .set(Session(partnerEmail, idChat))
+            .addOnSuccessListener {
+                createNewChatMine(idChat, partnerEmail)
+                createSesionPartner(idChat, partnerEmail)
+                Toast.makeText(this, "Sesion creada", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    fun createSesionPartner(idChat: String, partnerEmail: String){
+        Firebase.firestore
+            .collection("users")
+            .document(partnerEmail)
+            .collection("sessions")
+            .document(currentUser.email)
+            .set(Session(currentUser.email, idChat))
+        goToChat(partnerEmail, idChat)
+    }
+
+    fun goToChat(partnerEmail: String, idChat: String){
+        startActivity(Intent(this, ChatActivity::class.java).apply {
+            putExtra("sessionInformation", Gson().toJson(
+                Session(partnerEmail, idChat)
+            ))
+            putExtra("currentUser", Gson().toJson(currentUser))
+        })
+    }
+
+    fun createNewChatMine(idChat: String, partnerEmail: String){
+        Firebase.firestore
+            .collection("chats")
+            .document(idChat)
+            .collection("messages")
+            .document(UUID.randomUUID().toString())
+            .set(
+                Message(currentUser.email,
+                    "Hola! Este es nuestro primer mensaje :)",
+                    Timestamp.now()
+                )
+            )
+        }
+    }
+
+
+    /***
+     *
+     */
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun cipherPilot(){
@@ -113,4 +188,3 @@ class SessionActivity : AppCompatActivity() {
         )
         return String(plainText)
     }
-}
