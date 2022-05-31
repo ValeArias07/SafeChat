@@ -8,16 +8,6 @@
     tools:context=".SignUpActivity">
 
 
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordUser" />
-
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="wrap_content"
@@ -30,51 +20,91 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:srcCompat="@tools:sample/avatars" />
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:srcCompat="@drawable/cuervo_logo_png" />
     </androidx.cardview.widget.CardView>
 
     <EditText
-        android:id="@+id/emailUser"
+        android:id="@+id/emailUserSignUp"
+        android:layout_width="262dp"
+        android:layout_height="38dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/shaping_plain_text"
+        android:ems="10"
+        android:hint="Email"
+        android:inputType="textPersonName"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nicknameUser" />
+
+    <EditText
+        android:id="@+id/nicknameUser"
         android:layout_width="262dp"
         android:layout_height="38dp"
         android:layout_marginTop="44dp"
         android:background="@drawable/shaping_plain_text"
         android:ems="10"
+        android:hint="Nickname"
         android:inputType="textPersonName"
-        android:text="Email"
         android:textColor="@color/white"
+        android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
     <EditText
-        android:id="@+id/passwordUser"
+        android:id="@+id/passwordUserSignUp"
         android:layout_width="262dp"
         android:layout_height="38dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/shaping_plain_text"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Contraseña"
+        android:hint="Contraseña"
+        android:inputType="textPersonName|textPassword"
         android:textColor="@color/white"
+        android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailUser" />
+        app:layout_constraintTop_toBottomOf="@+id/emailUserSignUp" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="140dp"
         android:fontFamily="@font/poppins_semibold"
-        android:text="Iniciar Sesion"
+        android:text="Registrate"
         android:textColor="@color/white"
         android:textSize="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/signUpButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordUserSignUp" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="100dp"
+        app:layout_constraintBottom_toBottomOf="@+id/signUpButton"
+        app:layout_constraintEnd_toEndOf="@+id/signUpButton"
+        app:layout_constraintStart_toStartOf="@+id/signUpButton"
+        app:layout_constraintTop_toTopOf="@+id/signUpButton"
+        app:srcCompat="@drawable/send_logo" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

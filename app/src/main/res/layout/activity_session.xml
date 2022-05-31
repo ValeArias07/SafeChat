@@ -8,10 +8,23 @@
     tools:context=".SessionActivity">
 
 
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Made with ♥ by Ale and Vale"
+        android:textColor="@color/pale_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginButton" />
+
     <Button
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:layout_marginTop="44dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -30,36 +43,38 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:srcCompat="@tools:sample/avatars" />
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:srcCompat="@drawable/cuervo_logo_png" />
     </androidx.cardview.widget.CardView>
 
     <EditText
         android:id="@+id/emailPartner"
         android:layout_width="262dp"
         android:layout_height="38dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/shaping_plain_text"
         android:ems="10"
+        android:hint=" Email de Partner"
         android:inputType="textPersonName"
-        android:text=" Email de Partner"
         android:textColor="@color/white"
+        android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView" />
+        app:layout_constraintTop_toBottomOf="@+id/userNick" />
 
     <EditText
         android:id="@+id/passwordSesion"
         android:layout_width="262dp"
         android:layout_height="38dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/shaping_plain_text"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Contraseña de Sesion"
+        android:hint="Contraseña de Sesion"
+        android:inputType="textPersonName|textPassword"
         android:textColor="@color/white"
+        android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,7 +84,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="140dp"
         android:fontFamily="@font/poppins_semibold"
         android:text="Inicia una conversacion"
         android:textColor="@color/white"
@@ -77,4 +92,49 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="100dp"
+        android:src="@drawable/send_logo"
+        app:layout_constraintBottom_toBottomOf="@+id/loginButton"
+        app:layout_constraintEnd_toEndOf="@+id/loginButton"
+        app:layout_constraintStart_toStartOf="@+id/loginButton"
+        app:layout_constraintTop_toTopOf="@+id/loginButton"
+        app:layout_constraintVertical_bias="0.516" />
+
+    <Button
+        android:id="@+id/logOutButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/shape_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="100dp"
+        android:src="@drawable/log_out_logo"
+        app:layout_constraintBottom_toBottomOf="@+id/logOutButton"
+        app:layout_constraintEnd_toEndOf="@+id/logOutButton"
+        app:layout_constraintStart_toStartOf="@+id/logOutButton"
+        app:layout_constraintTop_toTopOf="@+id/logOutButton" />
+
+    <TextView
+        android:id="@+id/userNick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        tools:text="TextView"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/cardView"
+        app:layout_constraintStart_toStartOf="@+id/cardView"
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

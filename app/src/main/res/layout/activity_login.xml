@@ -7,6 +7,16 @@
     android:background="@color/bkg"
     tools:context=".LoginActivity">
 
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="19dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="wrap_content"
@@ -19,61 +29,105 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:srcCompat="@tools:sample/avatars" />
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:srcCompat="@drawable/cuervo_logo_png" />
     </androidx.cardview.widget.CardView>
 
     <EditText
-        android:id="@+id/emailUserSignUp"
+        android:id="@+id/emailUser"
         android:layout_width="262dp"
         android:layout_height="38dp"
         android:layout_marginTop="44dp"
         android:background="@drawable/shaping_plain_text"
         android:ems="10"
+        android:hint="Email"
         android:inputType="textPersonName"
-        android:text="Email"
         android:textColor="@color/white"
+        android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
     <EditText
-        android:id="@+id/passwordUserSignUp"
+        android:id="@+id/passwordUser"
         android:layout_width="262dp"
         android:layout_height="38dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/shaping_plain_text"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Contraseña"
+        android:hint="Contraseña"
+        android:inputType="textPersonName|textPassword"
         android:textColor="@color/white"
+        android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailUserSignUp" />
+        app:layout_constraintTop_toBottomOf="@+id/emailUser" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="140dp"
         android:fontFamily="@font/poppins_semibold"
-        android:text="Registrate"
+        android:text="Iniciar Sesion"
         android:textColor="@color/white"
         android:textSize="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/signUpButton"
+    <ImageView
+        android:id="@+id/imageView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="68dp"
+        android:elevation="100dp"
+        app:layout_constraintBottom_toBottomOf="@+id/loginButton"
+        app:layout_constraintEnd_toEndOf="@+id/loginButton"
+        app:layout_constraintStart_toStartOf="@+id/loginButton"
+        app:layout_constraintTop_toTopOf="@+id/loginButton"
+        app:srcCompat="@drawable/send_logo" />
+
+    <TextView
+        android:id="@+id/hyperText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:autoLink="none"
+        android:fontFamily="@font/poppins_semibold"
+        android:linksClickable="true"
+        android:text="Registrate"
+        android:textColor="@color/material_dynamic_primary70"
+        app:layout_constraintBottom_toBottomOf="@+id/textView4"
+        app:layout_constraintEnd_toEndOf="@+id/passwordUser"
+        app:layout_constraintTop_toTopOf="@+id/textView4"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="¿No tienes cuenta? "
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="@+id/passwordUser"
+        app:layout_constraintTop_toBottomOf="@+id/passwordUser" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Made with ♥ by Ale and Vale"
+        android:textColor="@color/pale_white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordUserSignUp" />
+        app:layout_constraintTop_toBottomOf="@+id/loginButton" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

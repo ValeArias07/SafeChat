@@ -22,6 +22,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
+            android:background="@color/bkg_pale"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -79,6 +80,17 @@
             app:layout_constraintBottom_toBottomOf="@+id/cardView2"
             app:layout_constraintStart_toEndOf="@+id/cardView2"
             app:layout_constraintTop_toTopOf="@+id/cardView2" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="100dp"
+            android:src="@drawable/send_logo"
+            app:layout_constraintBottom_toBottomOf="@+id/sendMsgButton"
+            app:layout_constraintEnd_toEndOf="@+id/sendMsgButton"
+            app:layout_constraintStart_toStartOf="@+id/sendMsgButton"
+            app:layout_constraintTop_toTopOf="@+id/sendMsgButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

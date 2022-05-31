@@ -1,10 +1,17 @@
 package com.icesi.savechat
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.icesi.savechat.databinding.ActivityLoginBinding
+import com.icesi.savechat.databinding.ActivitySessionBinding
+import com.icesi.savechat.model.User
 import java.security.SecureRandom
 import java.security.spec.KeySpec
 import java.util.*
@@ -18,14 +25,37 @@ import javax.crypto.spec.SecretKeySpec
 
 
 class SessionActivity : AppCompatActivity() {
-    @RequiresApi(Build.VERSION_CODES.O)
+
+    private lateinit var binding: ActivitySessionBinding
+    private lateinit var currentUser: User
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_session)
+        binding = ActivitySessionBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
+        binding.logOutButton.setOnClickListener {
+            Firebase.auth.signOut()
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
+
+        var email: String = Firebase.auth.currentUser?.email.toString()
+
+        if ( Firebase.auth.currentUser.toString() == "null") {
+            startActivity(Intent(this, LoginActivity::class.java))
+        } else {
+            Firebase.firestore.collection("users").document(email).get().addOnSuccessListener {
+                //currentUser = it.toObject(User::class.java)!!
+                binding.userNick.text = it.toObject(User::class.java)?.nick.toString()
+
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun cipherPilot(){
         val input = "valentina"
         val key: SecretKey = getKeyFromPassword("almohabana", "77")
-
 
         val ivParameterSpec: IvParameterSpec = generateIv()
         val algorithm = "AES/CBC/PKCS5Padding"

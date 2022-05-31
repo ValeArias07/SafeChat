@@ -3,13 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/drawable/ic_baseline_login_24.xml" value="0.1" />
+        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/drawable/shape_circle.xml" value="0.1" />
         <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/drawable/shaping_plain_text.xml" value="0.1" />
-        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_chat.xml" value="0.20416666666666666" />
-        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_login.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_chat.xml" value="0.75" />
+        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_login.xml" value="0.22" />
         <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_sesion.xml" value="0.19010416666666666" />
-        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_session.xml" value="0.20416666666666666" />
-        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_sign_up.xml" value="0.19010416666666666" />
+        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_session.xml" value="0.25" />
+        <entry key="..\:/Users/Valentina/AndroidStudioProjects/SaveChat/app/src/main/res/layout/activity_sign_up.xml" value="0.2" />
       </map>
     </option>
   </component>
