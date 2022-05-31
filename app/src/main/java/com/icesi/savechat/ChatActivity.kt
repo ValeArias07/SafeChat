@@ -29,8 +29,6 @@ class ChatActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         adapter = MessageAdapter()
-
-
         binding.recyclerMsgView.setHasFixedSize(true)
         binding.recyclerMsgView.layoutManager = LinearLayoutManager(
             this,
@@ -52,7 +50,6 @@ class ChatActivity : AppCompatActivity() {
         adapter.user = currentUser
 
         sesionInformation.let {
-            binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
             Firebase.firestore
                 .collection("chats")
                 .document(sesionInformation.idChat)
@@ -63,17 +60,19 @@ class ChatActivity : AppCompatActivity() {
                     for (doc in task.documents) {
                         var message = doc.toObject(Message::class.java)!!
                         adapter.addMessage(message)
+                        binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
                     }
                 }
         }
 
         binding.sendMsgButton.setOnClickListener {
-            binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
+
             var message: Message = Message(
                 currentUser.email,
                 binding.messageTextBox.text.toString(),
                 Timestamp.now()
             )
+
             Firebase.firestore
                 .collection("chats")
                 .document(sesionInformation.idChat)
@@ -94,6 +93,7 @@ class ChatActivity : AppCompatActivity() {
                         messages.let{
                             var list = it?.toMutableList()
                             adapter.setData(list)
+                            binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
                         }
                     }
                 }

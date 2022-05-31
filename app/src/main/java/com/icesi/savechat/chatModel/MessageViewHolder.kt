@@ -27,20 +27,15 @@ class MessageViewHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
     fun bindMessage(message: Message, email: String){
         this.message = message
         if (email == message.from) {
-            Log.e("mensaje mio ", email + ""+ message.from + ""+ message.msg)
             myMsgLayout.visibility = View.VISIBLE
             myMsgText.text = message.msg
 
             partnerLayout.visibility = View.GONE
         } else {
-            Log.e("mensaje de partner ", email + ""+ message.from + ""+ message.msg)
             myMsgLayout.visibility = View.GONE
             partnerMsgText.text = message.msg
 
             partnerLayout.visibility = View.VISIBLE
         }
-
-
-
     }
 }
