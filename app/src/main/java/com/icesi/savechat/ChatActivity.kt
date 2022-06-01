@@ -28,15 +28,73 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        loadExtras()
+        recyclerConfig()
+
+        sesionInformation.let {
+            loadMsgs()
+        }
+
+        binding.sendMsgButton.setOnClickListener {
+            sendMsg()
+        }
+    }
+
+    fun recyclerConfig(){
         adapter = MessageAdapter()
         binding.recyclerMsgView.setHasFixedSize(true)
-        binding.recyclerMsgView.layoutManager = LinearLayoutManager(
-            this,
-            LinearLayoutManager.VERTICAL, false
-        )
-
+        binding.recyclerMsgView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerMsgView.adapter = adapter
+    }
 
+    fun sendMsg(){
+        var message: Message = Message(currentUser.email, binding.messageTextBox.text.toString(), Timestamp.now())
+        Firebase.firestore
+            .collection("chats")
+            .document(sesionInformation.idChat)
+            .collection("messages")
+            .document(UUID.randomUUID().toString())
+            .set(message)
+            .addOnSuccessListener {
+                binding.messageTextBox.setText("")
+            }
+        loadNewMsg()
+    }
+
+    fun loadMsgs(){
+        Firebase.firestore
+            .collection("chats")
+            .document(sesionInformation.idChat)
+            .collection("messages")
+            .orderBy("date", Query.Direction.ASCENDING)
+            .get()
+            .addOnSuccessListener { task ->
+                for (doc in task.documents) {
+                    var message = doc.toObject(Message::class.java)!!
+                    adapter.addMessage(message)
+                    binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
+                }
+            }
+    }
+
+    fun loadNewMsg(){
+        Firebase.firestore
+            .collection("chats")
+            .document(sesionInformation.idChat)
+            .collection("messages")
+            .orderBy("date", Query.Direction.ASCENDING)
+            .addSnapshotListener { messages, error ->
+                if (error == null) {
+                    messages.let {
+                        var list = it?.toMutableList()
+                        adapter.setData(list)
+                        binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
+                    }
+                }
+            }
+    }
+
+    fun loadExtras(){
         sesionInformation = Gson().fromJson(
             intent.extras?.getString("sessionInformation", ""),
             Session::class.java
@@ -46,68 +104,13 @@ class ChatActivity : AppCompatActivity() {
             intent.extras?.getString("currentUser", ""),
             User::class.java
         )
-        searchPartnerNick(sesionInformation.idPartner)
         adapter.user = currentUser
 
-        sesionInformation.let {
-            Firebase.firestore
-                .collection("chats")
-                .document(sesionInformation.idChat)
-                .collection("messages")
-                .orderBy("date", Query.Direction.ASCENDING)
-                .get()
-                .addOnSuccessListener { task ->
-                    for (doc in task.documents) {
-                        var message = doc.toObject(Message::class.java)!!
-                        adapter.addMessage(message)
-                        binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
-                    }
-                }
-        }
+        partnerNick = Gson().fromJson(
+            intent.extras?.getString("partnerNick", ""),
+            Nick::class.java
+        ).nick
 
-        binding.sendMsgButton.setOnClickListener {
-
-            var message: Message = Message(
-                currentUser.email,
-                binding.messageTextBox.text.toString(),
-                Timestamp.now()
-            )
-
-            Firebase.firestore
-                .collection("chats")
-                .document(sesionInformation.idChat)
-                .collection("messages")
-                .document(UUID.randomUUID().toString())
-                .set(message)
-                .addOnSuccessListener {
-                    binding.messageTextBox.setText("")
-                }
-
-            Firebase.firestore
-                .collection("chats")
-                .document(sesionInformation.idChat)
-                .collection("messages")
-                .orderBy("date", Query.Direction.ASCENDING)
-                .addSnapshotListener { messages, error ->
-                    if(error == null){
-                        messages.let{
-                            var list = it?.toMutableList()
-                            adapter.setData(list)
-                            binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
-                        }
-                    }
-                }
-                }
-            binding.messageTextBox.setText("")
-        }
-
-    fun searchPartnerNick(partnerEmail: String){
-        Firebase.firestore
-            .collection("users")
-            .document(partnerEmail)
-            .get().addOnSuccessListener {
-                partnerNick = it.toObject(Nick::class.java)!!.nick
-                binding.partnerName.text = partnerNick
-            }
+        binding.partnerName.text = partnerNick
     }
 }

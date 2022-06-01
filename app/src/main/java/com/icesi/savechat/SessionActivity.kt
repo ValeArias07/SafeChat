@@ -12,7 +12,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import com.icesi.savechat.databinding.ActivityLoginBinding
 import com.icesi.savechat.databinding.ActivitySessionBinding
 import com.icesi.savechat.model.Message
 import com.icesi.savechat.model.Nick
@@ -34,6 +33,7 @@ class SessionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySessionBinding
     private lateinit var currentUser: User
+    private lateinit var partnerNick: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +41,7 @@ class SessionActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         var email: String = Firebase.auth.currentUser?.email.toString()
+
         binding.logOutButton.setOnClickListener {
             Firebase.auth.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
@@ -58,23 +59,42 @@ class SessionActivity : AppCompatActivity() {
         binding.startChatButton.setOnClickListener {
             var partnerEmail = binding.emailPartner.text.toString()
             //var password = binding.passwordSesion.text.toString()
-            Firebase.firestore.collection("users")
-                .document(currentUser.email)
-                .collection("sessions")
-                .whereEqualTo("idPartner", partnerEmail)
-                .get()
-                .addOnSuccessListener {
-                    if (it.size() != 0) {
-                        var sessionInformation = it.documents.get(0).toObject(Session::class.java)
-                        goToChat(sessionInformation!!.idPartner, sessionInformation!!.idChat)
-                    } else {
-                        createNewSession(partnerEmail)
-                    }
-                }
-        }
+            checkPartnerExist(partnerEmail)
+            }
     }
 
-    fun createNewSession(partnerEmail: String){
+    private fun checkPartnerExist(partnerEmail: String) {
+        Firebase.firestore
+            .collection("users")
+            .document(partnerEmail)
+            .get().addOnSuccessListener {
+                Log.e("hey", it.data.toString())
+                if (it.data.toString() != "null"){
+                    partnerNick = it.toObject(Nick::class.java)!!.nick
+                    startSession(partnerEmail, partnerNick)
+                }else {
+                    Toast.makeText(this, "El partner no existe", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun startSession(partnerEmail: String, partnerNick: String){
+        Firebase.firestore.collection("users")
+            .document(currentUser.email)
+            .collection("sessions")
+            .whereEqualTo("idPartner", partnerEmail)
+            .get()
+            .addOnSuccessListener {
+                if (it.size() != 0) {
+                    var sessionInformation = it.documents.get(0).toObject(Session::class.java)
+                    goToChat(sessionInformation!!.idPartner, sessionInformation!!.idChat, partnerNick)
+                } else {
+                    createNewSession(partnerEmail)
+                }
+            }
+    }
+
+    private fun createNewSession(partnerEmail: String) {
         var idChat: String = UUID.randomUUID().toString()
         Firebase.firestore.collection("users")
             .document(currentUser.email)
@@ -88,47 +108,50 @@ class SessionActivity : AppCompatActivity() {
             }
     }
 
-    fun createSesionPartner(idChat: String, partnerEmail: String){
+    private fun createSesionPartner(idChat: String, partnerEmail: String) {
         Firebase.firestore
             .collection("users")
             .document(partnerEmail)
             .collection("sessions")
             .document(currentUser.email)
             .set(Session(currentUser.email, idChat))
-        goToChat(partnerEmail, idChat)
+
     }
 
-    fun goToChat(partnerEmail: String, idChat: String){
-        startActivity(Intent(this, ChatActivity::class.java).apply {
-            putExtra("sessionInformation", Gson().toJson(
-                Session(partnerEmail, idChat)
-            ))
-            putExtra("currentUser", Gson().toJson(currentUser))
-        })
-    }
-
-    fun createNewChatMine(idChat: String, partnerEmail: String){
+    private fun createNewChatMine(idChat: String, partnerEmail: String) {
         Firebase.firestore
             .collection("chats")
             .document(idChat)
             .collection("messages")
             .document(UUID.randomUUID().toString())
             .set(
-                Message(currentUser.email,
+                Message(
+                    currentUser.email,
                     "Hola! Este es nuestro primer mensaje :)",
                     Timestamp.now()
                 )
             )
-        }
+        goToChat(partnerEmail, idChat, partnerNick)
     }
 
+    private fun goToChat(partnerEmail: String, idChat: String, partnerNick: String) {
+        startActivity(Intent(this, ChatActivity::class.java).apply {
+            putExtra(
+                "sessionInformation", Gson().toJson(
+                    Session(partnerEmail, idChat)
+                )
+            )
+            putExtra("currentUser", Gson().toJson(currentUser))
+            putExtra("partnerNick", partnerNick)
+        })
+    }
 
     /***
      *
      */
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun cipherPilot(){
+    fun cipherPilot() {
         val input = "valentina"
         val key: SecretKey = getKeyFromPassword("almohabana", "77")
 
@@ -166,7 +189,8 @@ class SessionActivity : AppCompatActivity() {
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun encrypt(algorithm: String?, input: String, key: SecretKey?,
+    fun encrypt(
+        algorithm: String?, input: String, key: SecretKey?,
         iv: IvParameterSpec?
     ): String {
         val cipher: Cipher = Cipher.getInstance(algorithm)
@@ -177,7 +201,8 @@ class SessionActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun decrypt(algorithm: String?, cipherText: String?, key: SecretKey?,
+    fun decrypt(
+        algorithm: String?, cipherText: String?, key: SecretKey?,
         iv: IvParameterSpec?
     ): String {
         val cipher = Cipher.getInstance(algorithm)
@@ -188,3 +213,4 @@ class SessionActivity : AppCompatActivity() {
         )
         return String(plainText)
     }
+}
