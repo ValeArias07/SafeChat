@@ -7,71 +7,40 @@
     android:background="@color/bkg"
     tools:context=".ChatActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="374dp"
-        android:layout_height="683dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="5dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerMsgView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
+        android:background="@drawable/shaping_plain_text"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView2" />
+
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView2"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="24dp"
+        app:cardCornerRadius="30dp"
+        app:layout_constraintStart_toStartOf="@+id/recyclerMsgView"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerMsgView"
-            android:layout_width="357dp"
-            android:layout_height="450dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shaping_plain_text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView2" />
-
-        <EditText
-            android:id="@+id/messageTextBox"
-            android:layout_width="260dp"
-            android:layout_height="49dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/shaping_plain_text"
-            android:ems="10"
-            android:hint="Escribe un mensaje"
-            android:inputType="textPersonName"
-            android:textColor="@color/pale_white_for_img"
-            android:textColorHint="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recyclerMsgView" />
-
-        <Button
-            android:id="@+id/sendMsgButton"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="20dp"
-            app:layout_constraintBottom_toBottomOf="@+id/messageTextBox"
-            app:layout_constraintStart_toEndOf="@+id/messageTextBox"
-            app:layout_constraintTop_toTopOf="@+id/messageTextBox" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView2"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            app:cardCornerRadius="30dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/cuervo_logo_png"
-                tools:src="@tools:sample/avatars" />
-        </androidx.cardview.widget.CardView>
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/cuervo_logo_png"
+            tools:src="@tools:sample/avatars" />
+    </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/partnerName"
@@ -86,6 +55,41 @@
             app:layout_constraintStart_toEndOf="@+id/cardView2"
             app:layout_constraintTop_toTopOf="@+id/cardView2" />
 
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/recyclerMsgView"
+        app:layout_constraintStart_toStartOf="@+id/recyclerMsgView">
+
+        <EditText
+            android:id="@+id/messageTextBox"
+            android:layout_width="270dp"
+            android:layout_height="49dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/shaping_plain_text"
+            android:ems="10"
+            android:hint="Escribe un mensaje"
+            android:inputType="textPersonName"
+            android:textColor="@color/pale_white_for_img"
+            android:textColorHint="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <Button
+            android:id="@+id/sendMsgButton"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintBottom_toBottomOf="@+id/messageTextBox"
+
+            app:layout_constraintStart_toEndOf="@+id/messageTextBox"
+            app:layout_constraintTop_toTopOf="@+id/messageTextBox" />
+
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="wrap_content"
@@ -97,5 +101,7 @@
             app:layout_constraintStart_toStartOf="@+id/sendMsgButton"
             app:layout_constraintTop_toTopOf="@+id/sendMsgButton" />
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
