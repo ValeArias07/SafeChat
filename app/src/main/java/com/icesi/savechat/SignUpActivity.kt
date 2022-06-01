@@ -25,6 +25,10 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
+    /***
+     * And here comes the SuperGiros app help. :)
+     */
+
     private fun validateUser() {
 
         var email: String = binding.emailUserSignUp.text.toString()
@@ -49,7 +53,8 @@ class SignUpActivity : AppCompatActivity() {
             })
             finish()
         }.addOnFailureListener{
-            Toast.makeText(this.baseContext, it.message, Toast.LENGTH_SHORT).show()        }
+            Toast.makeText(this.baseContext, it.message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun checkEmail(email: String ): Boolean{
