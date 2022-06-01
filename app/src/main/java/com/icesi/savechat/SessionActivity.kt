@@ -1,11 +1,8 @@
 package com.icesi.savechat
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
@@ -17,16 +14,7 @@ import com.icesi.savechat.model.Message
 import com.icesi.savechat.model.Nick
 import com.icesi.savechat.model.Session
 import com.icesi.savechat.model.User
-import java.security.SecureRandom
-import java.security.spec.KeySpec
 import java.util.*
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.PBEKeySpec
-import javax.crypto.spec.SecretKeySpec
 
 
 class SessionActivity : AppCompatActivity() {
@@ -39,8 +27,7 @@ class SessionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySessionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        var email: String = Firebase.auth.currentUser?.email.toString()
+        checkCurrentUser()
 
         binding.logOutButton.setOnClickListener {
             Firebase.auth.signOut()
@@ -48,20 +35,25 @@ class SessionActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.startChatButton.setOnClickListener {
+            var partnerEmail = binding.emailPartner.text.toString()
+            //var password = binding.passwordSesion.text.toString()
+            checkPartnerExist(partnerEmail.lowercase())
+            }
+    }
+
+    private fun checkCurrentUser(){
+        var email: String = Firebase.auth.currentUser?.email.toString()
+
         if (Firebase.auth.currentUser.toString() == "null") {
             startActivity(Intent(this, LoginActivity::class.java))
+            finish()
         } else {
             Firebase.firestore.collection("users").document(email).get().addOnSuccessListener {
                 currentUser = it.toObject(User::class.java)!!
                 binding.userNick.text = it.toObject(User::class.java)?.nick.toString()
             }
         }
-
-        binding.startChatButton.setOnClickListener {
-            var partnerEmail = binding.emailPartner.text.toString()
-            //var password = binding.passwordSesion.text.toString()
-            checkPartnerExist(partnerEmail.lowercase())
-            }
     }
 
     private fun checkPartnerExist(partnerEmail: String) {
@@ -79,6 +71,7 @@ class SessionActivity : AppCompatActivity() {
     }
 
     private fun startSession(partnerEmail: String, partnerNick: String){
+        var idChat = UUID.randomUUID().toString()
         Firebase.firestore.collection("users")
             .document(currentUser.email)
             .collection("sessions")
@@ -89,36 +82,29 @@ class SessionActivity : AppCompatActivity() {
                     var sessionInformation = it.documents.get(0).toObject(Session::class.java)
                     goToChat(sessionInformation!!.idPartner, sessionInformation!!.idChat, partnerNick)
                 } else {
-                    createNewSession(partnerEmail)
+                    createNewSession(idChat, partnerEmail, currentUser.email, true)
                 }
             }
     }
 
-    private fun createNewSession(partnerEmail: String) {
-        var idChat: String = UUID.randomUUID().toString()
+    /**
+     * Email is the partner email
+     */
+    private fun createNewSession(idChat: String, partnerEmail: String, currentEmail: String, isCurrentUser: Boolean){
         Firebase.firestore.collection("users")
-            .document(currentUser.email)
+            .document(currentEmail)
             .collection("sessions")
             .document(partnerEmail)
-            .set(Session(partnerEmail, idChat))
-            .addOnSuccessListener {
-                createNewChatMine(idChat, partnerEmail)
-                createSesionPartner(idChat, partnerEmail)
-                Toast.makeText(this, "Sesion creada", Toast.LENGTH_SHORT).show()
+            .set(Session(partnerEmail, idChat)).addOnSuccessListener {
+                if(isCurrentUser){
+                    createNewChat(idChat, partnerEmail)
+                    createNewSession(idChat, currentEmail, partnerEmail, false)
+                    Toast.makeText(this, "Sesion creada", Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
-    private fun createSesionPartner(idChat: String, partnerEmail: String) {
-        Firebase.firestore
-            .collection("users")
-            .document(partnerEmail)
-            .collection("sessions")
-            .document(currentUser.email)
-            .set(Session(currentUser.email, idChat))
-
-    }
-
-    private fun createNewChatMine(idChat: String, partnerEmail: String) {
+    private fun createNewChat(idChat: String, partnerEmail: String) {
         Firebase.firestore
             .collection("chats")
             .document(idChat)
@@ -144,73 +130,5 @@ class SessionActivity : AppCompatActivity() {
             putExtra("currentUser", Gson().toJson(currentUser))
             putExtra("partnerNick", partnerNick)
         })
-    }
-
-    /***
-     *
-     */
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun cipherPilot() {
-        val input = "valentina"
-        val key: SecretKey = getKeyFromPassword("almohabana", "77")
-
-        val ivParameterSpec: IvParameterSpec = generateIv()
-        val algorithm = "AES/CBC/PKCS5Padding"
-        val cipherText: String = encrypt(algorithm, input, key, ivParameterSpec)
-        val plainText: String = decrypt(algorithm, cipherText, key, ivParameterSpec)
-
-        Log.e("Plain: ", input)
-        Log.e("Cipher: ", cipherText)
-        Log.e("Plain: ", plainText)
-    }
-
-
-    fun generateKey(n: Int): SecretKey {
-        val keyGenerator: KeyGenerator = KeyGenerator.getInstance("AES")
-        keyGenerator.init(n)
-        return keyGenerator.generateKey()
-    }
-
-    fun generateIv(): IvParameterSpec {
-        val iv = ByteArray(16)
-        SecureRandom().nextBytes(iv)
-        return IvParameterSpec(iv)
-    }
-
-    fun getKeyFromPassword(password: String, salt: String): SecretKey {
-        val factory: SecretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-        val spec: KeySpec = PBEKeySpec(password.toCharArray(), salt.toByteArray(), 65536, 256)
-        return SecretKeySpec(
-            factory.generateSecret(spec)
-                .getEncoded(), "AES"
-        )
-    }
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun encrypt(
-        algorithm: String?, input: String, key: SecretKey?,
-        iv: IvParameterSpec?
-    ): String {
-        val cipher: Cipher = Cipher.getInstance(algorithm)
-        cipher.init(Cipher.ENCRYPT_MODE, key, iv)
-        val cipherText: ByteArray = cipher.doFinal(input.toByteArray())
-        return Base64.getEncoder()
-            .encodeToString(cipherText)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun decrypt(
-        algorithm: String?, cipherText: String?, key: SecretKey?,
-        iv: IvParameterSpec?
-    ): String {
-        val cipher = Cipher.getInstance(algorithm)
-        cipher.init(Cipher.DECRYPT_MODE, key, iv)
-        val plainText = cipher.doFinal(
-            Base64.getDecoder()
-                .decode(cipherText)
-        )
-        return String(plainText)
     }
 }
