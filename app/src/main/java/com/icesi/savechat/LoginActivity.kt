@@ -17,12 +17,12 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         binding.loginButton.setOnClickListener {
             var email = binding.emailUser.text.toString()
             var password = binding.passwordUser.text.toString()
             Firebase.auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
                 startActivity(Intent(this, SessionActivity::class.java))
+                finish()
             }.addOnFailureListener {
                 Toast.makeText(this.baseContext, it.message, Toast.LENGTH_SHORT).show()
             }

@@ -2,6 +2,7 @@ package com.icesi.savechat
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Query
@@ -42,6 +43,7 @@ class ChatActivity : AppCompatActivity() {
 
     fun recyclerConfig(){
         adapter = MessageAdapter()
+        adapter.user = currentUser
         binding.recyclerMsgView.setHasFixedSize(true)
         binding.recyclerMsgView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerMsgView.adapter = adapter
@@ -104,13 +106,9 @@ class ChatActivity : AppCompatActivity() {
             intent.extras?.getString("currentUser", ""),
             User::class.java
         )
-        adapter.user = currentUser
 
-        partnerNick = Gson().fromJson(
-            intent.extras?.getString("partnerNick", ""),
-            Nick::class.java
-        ).nick
-
+        partnerNick = (intent.extras?.getString("partnerNick", "").toString())
         binding.partnerName.text = partnerNick
+
     }
 }

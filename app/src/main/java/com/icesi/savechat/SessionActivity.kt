@@ -45,6 +45,7 @@ class SessionActivity : AppCompatActivity() {
         binding.logOutButton.setOnClickListener {
             Firebase.auth.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
+            finish()
         }
 
         if (Firebase.auth.currentUser.toString() == "null") {
@@ -59,7 +60,7 @@ class SessionActivity : AppCompatActivity() {
         binding.startChatButton.setOnClickListener {
             var partnerEmail = binding.emailPartner.text.toString()
             //var password = binding.passwordSesion.text.toString()
-            checkPartnerExist(partnerEmail)
+            checkPartnerExist(partnerEmail.lowercase())
             }
     }
 
@@ -68,7 +69,6 @@ class SessionActivity : AppCompatActivity() {
             .collection("users")
             .document(partnerEmail)
             .get().addOnSuccessListener {
-                Log.e("hey", it.data.toString())
                 if (it.data.toString() != "null"){
                     partnerNick = it.toObject(Nick::class.java)!!.nick
                     startSession(partnerEmail, partnerNick)
