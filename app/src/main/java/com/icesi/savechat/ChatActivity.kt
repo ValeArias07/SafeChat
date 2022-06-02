@@ -2,6 +2,7 @@ package com.icesi.savechat
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentChange
@@ -14,6 +15,7 @@ import com.icesi.savechat.model.Message
 import com.icesi.savechat.model.Session
 import com.icesi.savechat.model.User
 import com.icesi.savechat.chatModel.MessageAdapter
+import com.icesi.savechat.chatModel.MessageViewHolder
 import java.util.*
 
 class ChatActivity : AppCompatActivity() {
@@ -41,6 +43,7 @@ class ChatActivity : AppCompatActivity() {
         adapter = MessageAdapter()
         adapter.user = currentUser
         binding.recyclerMsgView.setHasFixedSize(true)
+        binding.recyclerMsgView
         binding.recyclerMsgView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerMsgView.adapter = adapter
     }
@@ -71,8 +74,8 @@ class ChatActivity : AppCompatActivity() {
                 for (doc in task.documents) {
                     var message = doc.toObject(Message::class.java)!!
                     adapter.addMessage(message)
-                    binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
                 }
+                binding.recyclerMsgView.scrollToPosition(adapter.size() - 1)
             }
     }
 
@@ -94,7 +97,7 @@ class ChatActivity : AppCompatActivity() {
                             DocumentChange.Type.ADDED->{
                                 val message = change.document.toObject((Message::class.java))
                                 adapter.addMessage(message)
-                                binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
+                                //binding.recyclerMsgView.scrollToPosition(adapter.size() - 1)
                             }
                             else -> {}
                         }

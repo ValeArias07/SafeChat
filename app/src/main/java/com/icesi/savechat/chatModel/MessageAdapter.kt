@@ -34,6 +34,7 @@ class MessageAdapter: RecyclerView.Adapter<MessageViewHolder>() {
         // AQUI SE DECRYPT
         messages.add(message)
         notifyItemInserted(messages.size-1)
+
     }
 
     fun size(): Int{

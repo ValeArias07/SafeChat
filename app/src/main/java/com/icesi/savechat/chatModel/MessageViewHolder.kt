@@ -11,8 +11,7 @@ import com.icesi.savechat.model.Message
 
 class MessageViewHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
 
-    private val messageLengthMax = 26
-
+    private val messageLengthMax = 20
     //STATE
     var message: Message? = null
 
@@ -34,25 +33,25 @@ class MessageViewHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
             myMsgLayout.visibility = View.VISIBLE
             partnerLayout.visibility = View.GONE
             if (message.msg.length >= messageLengthMax) {
+                myMsgTextLarge.text = message.msg
                 myMsgTextShort.visibility = View.GONE
                 myMsgTextLarge.visibility = View.VISIBLE
-                myMsgTextLarge.text = message.msg
             }else{
+                myMsgTextShort.text = message.msg
                 myMsgTextLarge.visibility = View.GONE
                 myMsgTextShort.visibility = View.VISIBLE
-                myMsgTextShort.text = message.msg
             }
         } else {
             myMsgLayout.visibility = View.GONE
             partnerLayout.visibility = View.VISIBLE
             if (message.msg.length >= messageLengthMax) {
+                partnerMsgTextLarge.text = message.msg
                 partnerMsgTextShort.visibility = View.GONE
                 partnerMsgTextLarge.visibility = View.VISIBLE
-                partnerMsgTextLarge.text = message.msg
             } else {
+                partnerMsgTextShort.text = message.msg
                 partnerMsgTextLarge.visibility = View.GONE
                 partnerMsgTextShort.visibility = View.VISIBLE
-                partnerMsgTextShort.text = message.msg
             }
         }
     }
