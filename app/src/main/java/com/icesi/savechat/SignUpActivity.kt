@@ -20,7 +20,7 @@ class SignUpActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.signUpButton.setOnClickListener { validateUser() }
     }
-    
+
     private fun validateUser() {
 
         var email: String = binding.emailUserSignUp.text.toString()
@@ -39,6 +39,7 @@ class SignUpActivity : AppCompatActivity() {
             Firebase.firestore.collection("users").document(email).set(user)
             Firebase.auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
                 startActivity(Intent(this, SessionActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     putExtra("user", Gson().toJson(user))
                 })
                 finish()
