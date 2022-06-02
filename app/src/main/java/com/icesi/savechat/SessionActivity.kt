@@ -38,23 +38,23 @@ class SessionActivity : AppCompatActivity() {
 
         binding.startChatButton.setOnClickListener {
             var partnerEmail = binding.emailPartner.text.toString()
-            //var password = binding.passwordSesion.text.toString()
-            checkPartnerExist(partnerEmail.lowercase())
-            }
+            if(checkEmail(partnerEmail)) checkPartnerExist(partnerEmail.lowercase())
+            else Toast.makeText(this,R.string.not_valid_email,Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun checkCurrentUser(){
-        var email: String = Firebase.auth.currentUser?.email.toString()
-
-        if (Firebase.auth.currentUser.toString() == "null") {
+        if (Firebase.auth.currentUser  == null) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         } else {
+            var email: String = Firebase.auth.currentUser?.email.toString()
             Firebase.firestore.collection("users").document(email).get().addOnSuccessListener {
                 val user = it.toObject(User::class.java)
                 if(user!=null) currentUser = user!!
                 else Log.e(">>>","CURRENT USER FROM FIRESTORE IS NULL FOR $email")
-                binding.userNick.text = it.toObject(User::class.java)?.nick.toString()
+
+                binding.userNick.text = user?.nick.toString()
             }
         }
     }
@@ -64,7 +64,7 @@ class SessionActivity : AppCompatActivity() {
             .collection("users")
             .document(partnerEmail)
             .get().addOnSuccessListener {
-                if (it.data.toString() != "null"){
+                if (it.data != null) {
                     partnerNick = it.toObject(Nick::class.java)!!.nick
                     startSession(partnerEmail, partnerNick)
                 }else {
@@ -74,7 +74,6 @@ class SessionActivity : AppCompatActivity() {
     }
 
     private fun startSession(partnerEmail: String, partnerNick: String){
-        var idChat = UUID.randomUUID().toString()
         Firebase.firestore.collection("users")
             .document(currentUser.email)
             .collection("sessions")
@@ -82,10 +81,10 @@ class SessionActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener {
                 if (it.size() != 0) {
-                    var sessionInformation = it.documents.get(0).toObject(Session::class.java)
+                    var sessionInformation = it.documents[0].toObject(Session::class.java)
                     goToChat(sessionInformation!!.idPartner, sessionInformation!!.idChat, partnerNick)
                 } else {
-                    createNewSession(idChat, partnerEmail, currentUser.email, true)
+                    createNewSession(partnerEmail, currentUser.email, true)
                 }
             }
     }
@@ -93,7 +92,22 @@ class SessionActivity : AppCompatActivity() {
     /**
      * Email is the partner email
      */
-    private fun createNewSession(idChat: String, partnerEmail: String, currentEmail: String, isCurrentUser: Boolean){
+    private fun createNewSession(partnerEmail: String, currentEmail: String, isCurrentUser: Boolean){
+        val idChat = UUID.randomUUID().toString()
+        Firebase.firestore.collection("users")
+            .document(currentEmail)
+            .collection("sessions")
+            .document(partnerEmail)
+            .set(Session(partnerEmail, idChat)).addOnSuccessListener {
+                if(isCurrentUser){
+                    createNewChat(idChat, partnerEmail)
+                    createNewSession(idChat, currentEmail, partnerEmail, false)
+                    Toast.makeText(this, "Sesion creada", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun createNewSession(idChat:String, partnerEmail: String, currentEmail: String, isCurrentUser: Boolean){
         Firebase.firestore.collection("users")
             .document(currentEmail)
             .collection("sessions")
@@ -133,5 +147,9 @@ class SessionActivity : AppCompatActivity() {
             putExtra("currentUser", Gson().toJson(currentUser))
             putExtra("partnerNick", partnerNick)
         })
+    }
+
+    private fun checkEmail(email: String ): Boolean{
+        return email.contains("@")
     }
 }

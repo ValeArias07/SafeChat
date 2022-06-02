@@ -11,16 +11,16 @@ import com.icesi.savechat.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
+    private val binding: ActivityLoginBinding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.loginButton.setOnClickListener {
             var email = binding.emailUser.text.toString()
             var password = binding.passwordUser.text.toString()
             Firebase.auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
+                it.user?.email.toString()
                 startActivity(Intent(this, SessionActivity::class.java))
                 finish()
             }.addOnFailureListener {
