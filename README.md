@@ -21,10 +21,10 @@ _Session Screen_
 ![Session Screen](https://github.com/ValeArias07/SafeChat/blob/master/images/session.png)
 
 
-When it's your first time chatting with your partner, he/she will be able to be notify.
-<!-- Put image of notify -->
 Now, you can send messages in a safe way to your partner.
-<!-- Put image of chat -->
+_Login Screen_
+
+![Login Screen](https://github.com/ValeArias07/SafeChat/blob/master/images/login.png)
 
 And even if you log out in the session screen, you can login with your email and password!
 
