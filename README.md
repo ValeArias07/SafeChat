@@ -22,9 +22,10 @@ _Session Screen_
 
 
 Now, you can send messages in a safe way to your partner.
-_Login Screen_
 
-![Login Screen](https://github.com/ValeArias07/SafeChat/blob/master/images/login.png)
+_Chat Screen_
+
+![Chat Screen](https://github.com/ValeArias07/SafeChat/blob/master/images/chat.png)
 
 And even if you log out in the session screen, you can login with your email and password!
 
