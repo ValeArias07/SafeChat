@@ -65,9 +65,14 @@ The Tyx number is going to be your secret password to cipher all the messages in
 
 ## With what kind of problems we had to fight to?
 We have to confess it: 
-> The most problematic part of this app was the notification system. 
+The most difficult part of the app was
 
-To use the push notification, we had to import and do a lot of things. But despite that, we achive the result that we want to 😊 . 
+> the exchange of the values p,g and vi. These elements has their own classes and convert them properly to storage them in the db was a complete challenge. 
+
+The mechanism of session was a real challenge and we use a few of strategies to save data properly and make  the encrypt and decrypt process
+
+
+But despite that, we achive the result that we want to 😊. 
 
 ## Final comments about this app
 .
