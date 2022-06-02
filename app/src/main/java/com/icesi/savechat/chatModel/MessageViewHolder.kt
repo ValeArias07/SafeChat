@@ -1,4 +1,4 @@
-package com.icesi.umarket.model
+package com.icesi.savechat.chatModel
 
 import android.util.Log
 import android.view.View

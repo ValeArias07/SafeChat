@@ -2,46 +2,42 @@ package com.icesi.savechat
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.icesi.savechat.databinding.ActivityChatBinding
 import com.icesi.savechat.model.Message
-import com.icesi.savechat.model.Nick
 import com.icesi.savechat.model.Session
 import com.icesi.savechat.model.User
-import com.icesi.umarket.model.MessageAdapter
+import com.icesi.savechat.chatModel.MessageAdapter
 import java.util.*
 
 class ChatActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityChatBinding
     private lateinit var adapter: MessageAdapter
-    private lateinit var sesionInformation: Session
+    private lateinit var sessionInformation: Session
     private lateinit var currentUser: User
     private lateinit var partnerNick: String
 
+    private val binding: ActivityChatBinding by lazy { ActivityChatBinding.inflate(layoutInflater) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         loadExtras()
         recyclerConfig()
-
-        sesionInformation.let {
-            loadMsgs()
-        }
+        loadMsgs()
 
         binding.sendMsgButton.setOnClickListener {
             sendMsg()
         }
     }
 
-    fun recyclerConfig(){
+    private fun recyclerConfig(){
         adapter = MessageAdapter()
         adapter.user = currentUser
         binding.recyclerMsgView.setHasFixedSize(true)
@@ -49,11 +45,12 @@ class ChatActivity : AppCompatActivity() {
         binding.recyclerMsgView.adapter = adapter
     }
 
-    fun sendMsg(){
-        var message: Message = Message(currentUser.email, binding.messageTextBox.text.toString(), Timestamp.now())
+    private fun sendMsg(){
+        var message = Message(currentUser.email, binding.messageTextBox.text.toString(), Timestamp.now())
+        //ENCRIPTAR
         Firebase.firestore
             .collection("chats")
-            .document(sesionInformation.idChat)
+            .document(sessionInformation.idChat)
             .collection("messages")
             .document(UUID.randomUUID().toString())
             .set(message)
@@ -63,10 +60,10 @@ class ChatActivity : AppCompatActivity() {
         loadNewMsg()
     }
 
-    fun loadMsgs(){
+    private fun loadMsgs(){
         Firebase.firestore
             .collection("chats")
-            .document(sesionInformation.idChat)
+            .document(sessionInformation.idChat)
             .collection("messages")
             .orderBy("date", Query.Direction.ASCENDING)
             .get()
@@ -79,25 +76,35 @@ class ChatActivity : AppCompatActivity() {
             }
     }
 
-    fun loadNewMsg(){
+    private fun loadNewMsg(){
         Firebase.firestore
             .collection("chats")
-            .document(sesionInformation.idChat)
+            .document(sessionInformation.idChat)
             .collection("messages")
             .orderBy("date", Query.Direction.ASCENDING)
             .addSnapshotListener { messages, error ->
                 if (error == null) {
-                    messages.let {
-                        var list = it?.toMutableList()
-                        adapter.setData(list)
-                        binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
+                    // messages.let {
+                    // var list = it?.toMutableList()
+                    // adapter.setData(list)
+                    // binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
+                    // }
+                    for(change in messages!!.documentChanges){
+                        when(change.type){
+                            DocumentChange.Type.ADDED->{
+                                val message = change.document.toObject((Message::class.java))
+                                adapter.addMessage(message)
+                                binding.recyclerMsgView.scrollToPosition(adapter.size() - 1);
+                            }
+                            else -> {}
+                        }
                     }
                 }
             }
     }
 
-    fun loadExtras(){
-        sesionInformation = Gson().fromJson(
+    private fun loadExtras(){
+        sessionInformation = Gson().fromJson(
             intent.extras?.getString("sessionInformation", ""),
             Session::class.java
         )
@@ -109,6 +116,5 @@ class ChatActivity : AppCompatActivity() {
 
         partnerNick = (intent.extras?.getString("partnerNick", "").toString())
         binding.partnerName.text = partnerNick
-
     }
 }

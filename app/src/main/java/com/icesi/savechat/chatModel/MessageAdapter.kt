@@ -1,4 +1,4 @@
-package com.icesi.umarket.model
+package com.icesi.savechat.chatModel
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -16,19 +16,9 @@ class MessageAdapter: RecyclerView.Adapter<MessageViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.message_row,parent,false)
-        val messageViewHolder = MessageViewHolder(view)
+        val view = inflater.inflate(R.layout.message_row, parent, false)
 
-        return messageViewHolder
-    }
-
-    fun setData(list: MutableList<QueryDocumentSnapshot>?){
-        var auxMessages = ArrayList<Message>()
-        list?.onEach { task ->
-            auxMessages.add(task.toObject(Message::class.java))
-        }
-        messages = auxMessages
-        notifyDataSetChanged()
+        return MessageViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
@@ -41,6 +31,7 @@ class MessageAdapter: RecyclerView.Adapter<MessageViewHolder>() {
     }
 
     fun addMessage(message: Message){
+        // AQUI SE DECRYPT
         messages.add(message)
         notifyItemInserted(messages.size-1)
     }
