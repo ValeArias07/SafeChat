@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SaveChat</string>
+    <string name="not_valid_email">Eso no parece un email</string>
+    <string name="not_valid_password">No se han cumplido todos los requisitos de la contraseña\n¡Es para proteger tu cuenta!</string>
 </resources>

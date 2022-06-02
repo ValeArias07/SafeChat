@@ -2,6 +2,7 @@ package com.icesi.savechat
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Timestamp
@@ -19,13 +20,13 @@ import java.util.*
 
 class SessionActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivitySessionBinding
     private lateinit var currentUser: User
     private lateinit var partnerNick: String
 
+    private val binding: ActivitySessionBinding by lazy { ActivitySessionBinding.inflate(layoutInflater) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySessionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         checkCurrentUser()
 
@@ -50,7 +51,9 @@ class SessionActivity : AppCompatActivity() {
             finish()
         } else {
             Firebase.firestore.collection("users").document(email).get().addOnSuccessListener {
-                currentUser = it.toObject(User::class.java)!!
+                val user = it.toObject(User::class.java)
+                if(user!=null) currentUser = user!!
+                else Log.e(">>>","CURRENT USER FROM FIRESTORE IS NULL FOR $email")
                 binding.userNick.text = it.toObject(User::class.java)?.nick.toString()
             }
         }
