@@ -11,6 +11,8 @@ import com.icesi.savechat.model.Message
 
 class MessageViewHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
 
+    private val messageLengthMax = 26
+
     //STATE
     var message: Message? = null
 
@@ -18,8 +20,10 @@ class MessageViewHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
     var myMsgLayout: ConstraintLayout = itemView.findViewById(R.id.myMessageLayout)
     var partnerLayout: ConstraintLayout = itemView.findViewById(R.id.partnerMessageLayout)
 
-    var myMsgText: TextView = itemView.findViewById(R.id.myMsgText)
-    var partnerMsgText: TextView = itemView.findViewById(R.id.partnerMsgText)
+    var myMsgTextShort: TextView = itemView.findViewById(R.id.myMsgTextShort)
+    var myMsgTextLarge: TextView = itemView.findViewById(R.id.myMsgTextLarge)
+    var partnerMsgTextShort: TextView = itemView.findViewById(R.id.partnerMsgTextShort)
+    var partnerMsgTextLarge: TextView = itemView.findViewById(R.id.partnerMsgTextLarge)
 
     init {
     }
@@ -28,14 +32,28 @@ class MessageViewHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
         this.message = message
         if (email == message.from) {
             myMsgLayout.visibility = View.VISIBLE
-            myMsgText.text = message.msg
-
             partnerLayout.visibility = View.GONE
+            if (message.msg.length >= messageLengthMax) {
+                myMsgTextShort.visibility = View.GONE
+                myMsgTextLarge.visibility = View.VISIBLE
+                myMsgTextLarge.text = message.msg
+            }else{
+                myMsgTextLarge.visibility = View.GONE
+                myMsgTextShort.visibility = View.VISIBLE
+                myMsgTextShort.text = message.msg
+            }
         } else {
             myMsgLayout.visibility = View.GONE
-            partnerMsgText.text = message.msg
-
             partnerLayout.visibility = View.VISIBLE
+            if (message.msg.length >= messageLengthMax) {
+                partnerMsgTextShort.visibility = View.GONE
+                partnerMsgTextLarge.visibility = View.VISIBLE
+                partnerMsgTextLarge.text = message.msg
+            } else {
+                partnerMsgTextLarge.visibility = View.GONE
+                partnerMsgTextShort.visibility = View.VISIBLE
+                partnerMsgTextShort.text = message.msg
+            }
         }
     }
 }
