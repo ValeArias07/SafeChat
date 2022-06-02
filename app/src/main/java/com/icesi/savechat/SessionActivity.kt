@@ -1,9 +1,11 @@
 package com.icesi.savechat
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
@@ -11,10 +13,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.icesi.savechat.databinding.ActivitySessionBinding
-import com.icesi.savechat.model.Message
-import com.icesi.savechat.model.Nick
-import com.icesi.savechat.model.Session
-import com.icesi.savechat.model.User
+import com.icesi.savechat.model.*
 import java.util.*
 
 
@@ -22,9 +21,11 @@ class SessionActivity : AppCompatActivity() {
 
     private lateinit var currentUser: User
     private lateinit var partnerNick: String
+    private var pin : String = ""
 
     private val binding: ActivitySessionBinding by lazy { ActivitySessionBinding.inflate(layoutInflater) }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -37,9 +38,13 @@ class SessionActivity : AppCompatActivity() {
         }
 
         binding.startChatButton.setOnClickListener {
-            var partnerEmail = binding.emailPartner.text.toString()
-            if(checkEmail(partnerEmail)) checkPartnerExist(partnerEmail.lowercase())
-            else Toast.makeText(this,R.string.not_valid_email,Toast.LENGTH_SHORT).show()
+            pin = binding.passwordSesion.text.toString()
+            if(pin == "")Toast.makeText(this, R.string.empty_field, Toast.LENGTH_SHORT).show()
+            else{
+                var partnerEmail = binding.emailPartner.text.toString()
+                if(checkEmail(partnerEmail)) checkPartnerExist(partnerEmail.lowercase())
+                else Toast.makeText(this,R.string.not_valid_email,Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -59,6 +64,7 @@ class SessionActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun checkPartnerExist(partnerEmail: String) {
         Firebase.firestore
             .collection("users")
@@ -73,6 +79,7 @@ class SessionActivity : AppCompatActivity() {
             }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun startSession(partnerEmail: String, partnerNick: String){
         Firebase.firestore.collection("users")
             .document(currentUser.email)
@@ -82,9 +89,9 @@ class SessionActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 if (it.size() != 0) {
                     var sessionInformation = it.documents[0].toObject(Session::class.java)
-                    goToChat(sessionInformation!!.idPartner, sessionInformation!!.idChat, partnerNick)
+                    goToChat(sessionInformation!!, partnerNick)
                 } else {
-                    createNewSession(partnerEmail, currentUser.email, true)
+                    createNewChat(partnerEmail)
                 }
             }
     }
@@ -92,60 +99,54 @@ class SessionActivity : AppCompatActivity() {
     /**
      * Email is the partner email
      */
-    private fun createNewSession(partnerEmail: String, currentEmail: String, isCurrentUser: Boolean){
-        val idChat = UUID.randomUUID().toString()
-        Firebase.firestore.collection("users")
-            .document(currentEmail)
-            .collection("sessions")
-            .document(partnerEmail)
-            .set(Session(partnerEmail, idChat)).addOnSuccessListener {
-                if(isCurrentUser){
-                    createNewChat(idChat, partnerEmail)
-                    createNewSession(idChat, currentEmail, partnerEmail, false)
-                    Toast.makeText(this, "Sesion creada", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
 
-    private fun createNewSession(idChat:String, partnerEmail: String, currentEmail: String, isCurrentUser: Boolean){
-        Firebase.firestore.collection("users")
-            .document(currentEmail)
-            .collection("sessions")
-            .document(partnerEmail)
-            .set(Session(partnerEmail, idChat)).addOnSuccessListener {
-                if(isCurrentUser){
-                    createNewChat(idChat, partnerEmail)
-                    createNewSession(idChat, currentEmail, partnerEmail, false)
-                    Toast.makeText(this, "Sesion creada", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
 
-    private fun createNewChat(idChat: String, partnerEmail: String) {
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun createNewChat(partnerEmail: String) {
+
+        var parameters = DiffieHellman().calculateGP()
+        var g = parameters[0]
+        var p = parameters[1]
+        var iv = Cipher().generateIv().iv
+        var ivToString = String(iv, java.nio.charset.StandardCharsets.UTF_8)
         Firebase.firestore
             .collection("chats")
-            .document(idChat)
-            .collection("messages")
-            .document(UUID.randomUUID().toString())
-            .set(
-                Message(
-                    currentUser.email,
-                    "Hola! Este es nuestro primer mensaje :)",
-                    Timestamp.now()
-                )
-            )
-        goToChat(partnerEmail, idChat, partnerNick)
+            .add(hashMapOf("p" to p, "g" to g, "iv" to ivToString)).addOnSuccessListener {
+                val idChat = it.id
+                Firebase.firestore
+                    .collection("chats")
+                    .document(idChat)
+                    .collection("messages").add(
+                        Message(
+                            currentUser.email,
+                            "Hola! :), estamos esperando a que tu compañero termine el intercambio",
+                            Timestamp.now()
+                        )
+                    )
+                createNewSession(idChat,partnerEmail, currentUser.email, p,g,0, ivToString)
+                createNewSession(idChat,currentUser.email, partnerEmail, p,g,DiffieHellman().calculateTx(Integer.parseInt(pin),g,p), ivToString)
+                goToChat(Session(partnerEmail,idChat,0,p,g, ivToString), partnerNick)
+            }
     }
 
-    private fun goToChat(partnerEmail: String, idChat: String, partnerNick: String) {
+    private fun createNewSession(idChat:String, partnerEmail: String, currentEmail: String, p:Int,g:Int, ty:Int, iv:String){
+        val s = Session(partnerEmail,idChat, ty, p, g, iv)
+        Firebase.firestore.collection("users")
+            .document(currentEmail)
+            .collection("sessions")
+            .document(partnerEmail)
+            .set(s).addOnSuccessListener {
+                Log.e(">>>", "Se ha creado la session")
+            }
+    }
+
+
+    private fun goToChat(s:Session, partnerNick: String) {
         startActivity(Intent(this, ChatActivity::class.java).apply {
-            putExtra(
-                "sessionInformation", Gson().toJson(
-                    Session(partnerEmail, idChat)
-                )
-            )
+            putExtra("sessionInformation", Gson().toJson(s))
             putExtra("currentUser", Gson().toJson(currentUser))
             putExtra("partnerNick", partnerNick)
+            putExtra("pin", pin)
         })
     }
 

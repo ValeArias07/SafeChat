@@ -16,21 +16,22 @@ import javax.crypto.spec.SecretKeySpec
 
 class Cipher {
 
+    private val algorithm: String = "AES/CBC/PKCS5Padding"
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun cipherPilot() {
         val input = "valentina"
         val key: SecretKey = getKeyFromPassword("almohabana", "77")
 
         val ivParameterSpec: IvParameterSpec = generateIv()
-        val algorithm = "AES/CBC/PKCS5Padding"
-        val cipherText: String = encrypt(algorithm, input, key, ivParameterSpec)
-        val plainText: String = decrypt(algorithm, cipherText, key, ivParameterSpec)
+        //val algorithm = "AES/CBC/PKCS5Padding"
+        val cipherText: String = encrypt(input, key, ivParameterSpec)
+        val plainText: String = decrypt(cipherText, key, ivParameterSpec)
 
         Log.e("Plain: ", input)
         Log.e("Cipher: ", cipherText)
         Log.e("Plain: ", plainText)
     }
-
 
     fun generateKey(n: Int): SecretKey {
         val keyGenerator: KeyGenerator = KeyGenerator.getInstance("AES")
@@ -55,11 +56,10 @@ class Cipher {
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun encrypt(
-        algorithm: String?, input: String, key: SecretKey?,
+    fun encrypt(input: String, key: SecretKey?,
         iv: IvParameterSpec?
     ): String {
-        val cipher: Cipher = Cipher.getInstance(algorithm)
+        val cipher: Cipher = Cipher.getInstance(this.algorithm)
         cipher.init(Cipher.ENCRYPT_MODE, key, iv)
         val cipherText: ByteArray = cipher.doFinal(input.toByteArray())
         return Base64.getEncoder()
@@ -67,11 +67,10 @@ class Cipher {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun decrypt(
-        algorithm: String?, cipherText: String?, key: SecretKey?,
+    fun decrypt(cipherText: String?, key: SecretKey?,
         iv: IvParameterSpec?
     ): String {
-        val cipher = Cipher.getInstance(algorithm)
+        val cipher = Cipher.getInstance(this.algorithm)
         cipher.init(Cipher.DECRYPT_MODE, key, iv)
         val plainText = cipher.doFinal(
             Base64.getDecoder()

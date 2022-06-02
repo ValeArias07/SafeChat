@@ -1,5 +1,6 @@
 package com.icesi.savechat.chatModel
 
+import android.graphics.Typeface
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -19,10 +20,10 @@ class MessageViewHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
     var myMsgLayout: ConstraintLayout = itemView.findViewById(R.id.myMessageLayout)
     var partnerLayout: ConstraintLayout = itemView.findViewById(R.id.partnerMessageLayout)
 
-    var myMsgTextShort: TextView = itemView.findViewById(R.id.myMsgTextShort)
-    var myMsgTextLarge: TextView = itemView.findViewById(R.id.myMsgTextLarge)
-    var partnerMsgTextShort: TextView = itemView.findViewById(R.id.partnerMsgTextShort)
-    var partnerMsgTextLarge: TextView = itemView.findViewById(R.id.partnerMsgTextLarge)
+    private var myMsgTextShort: TextView = itemView.findViewById(R.id.myMsgTextShort)
+    private var myMsgTextLarge: TextView = itemView.findViewById(R.id.myMsgTextLarge)
+    private var partnerMsgTextShort: TextView = itemView.findViewById(R.id.partnerMsgTextShort)
+    private var partnerMsgTextLarge: TextView = itemView.findViewById(R.id.partnerMsgTextLarge)
 
     init {
     }
@@ -54,5 +55,19 @@ class MessageViewHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
                 partnerMsgTextShort.visibility = View.VISIBLE
             }
         }
+    }
+
+    fun setSystemTextMode(){
+        myMsgTextShort.setTypeface(null, Typeface.ITALIC)
+        myMsgTextLarge.setTypeface(null, Typeface.ITALIC)
+        partnerMsgTextShort.setTypeface(null, Typeface.ITALIC)
+        partnerMsgTextLarge.setTypeface(null, Typeface.ITALIC)
+    }
+
+    fun setNormalTextMode(){
+        myMsgTextShort.setTypeface(null, Typeface.NORMAL)
+        myMsgTextLarge.setTypeface(null, Typeface.NORMAL)
+        partnerMsgTextShort.setTypeface(null, Typeface.NORMAL)
+        partnerMsgTextLarge.setTypeface(null, Typeface.NORMAL)
     }
 }
