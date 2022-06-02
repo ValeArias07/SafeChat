@@ -104,11 +104,10 @@ class SessionActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.S)
     private fun createNewChat(partnerEmail: String) {
 
-        var parameters = DiffieHellman().calculateGP()
-        var g = parameters[0]
-        var p = parameters[1]
+        var g = DiffieHellman().calculateG()
+        var p = DiffieHellman().calculateP()
         var iv = Cipher().generateIv().iv
-        var ivToString = String(iv, java.nio.charset.StandardCharsets.UTF_8)
+        var ivToString = iv.contentToString()
         Firebase.firestore
             .collection("chats")
             .add(hashMapOf("p" to p, "g" to g, "iv" to ivToString)).addOnSuccessListener {
@@ -129,7 +128,7 @@ class SessionActivity : AppCompatActivity() {
             }
     }
 
-    private fun createNewSession(idChat:String, partnerEmail: String, currentEmail: String, p:Int,g:Int, ty:Int, iv:String){
+    private fun createNewSession(idChat:String, partnerEmail: String, currentEmail: String, p:Long,g:Int, ty:Long, iv:String){
         val s = Session(partnerEmail,idChat, ty, p, g, iv)
         Firebase.firestore.collection("users")
             .document(currentEmail)

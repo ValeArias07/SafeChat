@@ -1,5 +1,6 @@
 package com.icesi.savechat.chatModel
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +26,7 @@ class MessageAdapter: RecyclerView.Adapter<MessageViewHolder>() {
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val message = messages[position]
-        if(position in 0..1) holder.setSystemTextMode()
+        if(position <= 1)holder.setSystemTextMode()
         else holder.setNormalTextMode()
         holder.bindMessage(message, user.email)
     }
@@ -35,10 +36,11 @@ class MessageAdapter: RecyclerView.Adapter<MessageViewHolder>() {
     }
 
     fun addMessage(message: Message){
-        if(messages.size in 0..1) messages.add(message)
+        if(messages.size <=1) messages.add(message)
         else messages.add(message.apply { msg = listener!!.onDecrypt(message.msg) })
 
         notifyItemInserted(messages.size-1)
+        Log.e(">>>","size adapater: ${messages.size}")
     }
 
     fun size(): Int{

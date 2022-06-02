@@ -2,6 +2,7 @@ package com.icesi.savechat
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
@@ -13,6 +14,7 @@ import com.google.gson.Gson
 import com.icesi.savechat.databinding.ActivityChatBinding
 import com.icesi.savechat.chatModel.MessageAdapter
 import com.icesi.savechat.model.*
+import java.math.BigInteger
 import java.util.*
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
@@ -25,7 +27,8 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
     private lateinit var userPin : String
 
     private var key: SecretKey? = null
-    private val iv get() = IvParameterSpec(sessionInformation.iv.toByteArray(java.nio.charset.StandardCharsets.UTF_8))
+    private var iv : IvParameterSpec? = null
+    private var isTyZero : Boolean = false
 
     private val binding: ActivityChatBinding by lazy { ActivityChatBinding.inflate(layoutInflater) }
 
@@ -38,12 +41,29 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
         binding.messageTextBox.isEnabled = false
 
         loadExtras()
+        isTyZero = sessionInformation.ty == 0L
+        initializeIv()
         recyclerConfig()
-        loadMsgs()
+        //loadMsgs()
+        loadNewMsg()
 
         binding.sendMsgButton.setOnClickListener {
             sendMsg()
         }
+    }
+
+    private fun initializeIv(){
+        var ivMod= sessionInformation.iv.replace("[", "")
+        ivMod = ivMod.replace("]", "")
+        ivMod = ivMod.replace(" ", "")
+        var arrayVI = ivMod.split(",")
+        var intArray = ByteArray(arrayVI.size)
+        var index = 0;
+        for(doc in arrayVI){
+            intArray[index]= BigInteger(arrayVI[index]).intValueExact().toByte()
+            index++
+        }
+        iv = IvParameterSpec(intArray)
     }
 
     private fun loadExtras(){
@@ -73,10 +93,11 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
             .orderBy("date", Query.Direction.ASCENDING)
             .get()
             .addOnSuccessListener { task ->
-                if (task.size() in 0..2){
+                if (task.size() <= 2){
                     for (doc in task.documents) {
                         var message = doc.toObject(Message::class.java)!!
                         adapter.addMessage(message)
+                        Log.e(">>>", "He cargado un mensaje desde loadMsgs")
                     }
                     verifyStartMessage()
                 }else{
@@ -84,6 +105,7 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
                     for (doc in task.documents) {
                         var message = doc.toObject(Message::class.java)!!
                         adapter.addMessage(message)
+                        Log.e(">>>", "He cargado un mensaje desde loadMsgs")
                     }
                     binding.sendMsgButton.isEnabled = true
                     binding.messageTextBox.isEnabled = true
@@ -94,37 +116,37 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
     }
 
     private fun verifyStartMessage(){
-        if (sessionInformation.ty == 0){
-            loadNewMsg()
-        }else if(adapter.size()==1){
-            Firebase.firestore.collection("users")
-                .document(sessionInformation.idPartner)
-                .collection("sessions")
-                .document(currentUser.email)
-                .update("ty", DiffieHellman().calculateTx(Integer.parseInt(userPin),sessionInformation.g, sessionInformation.p))
-                .addOnSuccessListener {
-                    Firebase.firestore
-                        .collection("chats")
-                        .document(sessionInformation.idChat)
-                        .collection("messages").add(
-                            Message(
-                                currentUser.email,
-                                "Intercambio terminado! :)",
-                                Timestamp.now()
-                            )
-                        ).addOnSuccessListener {
-                            binding.sendMsgButton.isEnabled = true
-                            binding.messageTextBox.isEnabled = true
-                            initKey()
-                            loadNewMsg()
-                        }
-                }
-        }else{
+        if(adapter.size()==2 && isTyZero) {
+            updateCurrentTy()
+        } else if (adapter.size()==2){
             binding.sendMsgButton.isEnabled = true
             binding.messageTextBox.isEnabled = true
             initKey()
-            loadNewMsg()
         }
+    }
+
+    private fun startWithPartner(){
+        Firebase.firestore.collection("users")
+            .document(sessionInformation.idPartner)
+            .collection("sessions")
+            .document(currentUser.email)
+            .update("ty", DiffieHellman().calculateTx(Integer.parseInt(userPin),sessionInformation.g, sessionInformation.p))
+            .addOnSuccessListener {
+                Firebase.firestore
+                    .collection("chats")
+                    .document(sessionInformation.idChat)
+                    .collection("messages").add(
+                        Message(
+                            currentUser.email,
+                            "Intercambio terminado! :)",
+                            Timestamp.now()
+                        )
+                    ).addOnSuccessListener {
+                        binding.sendMsgButton.isEnabled = true
+                        binding.messageTextBox.isEnabled = true
+                        initKey()
+                    }
+            }
     }
 
     private fun sendMsg(){
@@ -144,6 +166,7 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
     }
 
     private fun loadNewMsg(){
+        var partnerWaitForMe = false
         Firebase.firestore
             .collection("chats")
             .document(sessionInformation.idChat)
@@ -151,15 +174,19 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
             .orderBy("date", Query.Direction.ASCENDING)
             .addSnapshotListener { messages, error ->
                 if (error == null) {
+                    Log.e(">>>", "message size: ${messages!!.size()}")
+                    if (messages!!.size()==1 && !isTyZero) partnerWaitForMe = true
                     for(change in messages!!.documentChanges){
                         when(change.type){
                             DocumentChange.Type.ADDED->{
-                                if(adapter.size()==1){
-                                    updateCurrentTy()
-                                }
                                 val message = change.document.toObject((Message::class.java))
                                 adapter.addMessage(message)
-                                //binding.recyclerMsgView.scrollToPosition(adapter.size() - 1)
+                                Log.e(">>>", "He cargado un mensaje desde loadNewMsg")
+                                if(partnerWaitForMe){
+                                    startWithPartner()
+                                    partnerWaitForMe = false
+                                }else if(adapter.size()<=2) verifyStartMessage()
+                                binding.recyclerMsgView.scrollToPosition(adapter.size() - 1)
                             }
                             else -> {}
                         }
@@ -169,8 +196,10 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
     }
 
     private fun initKey(){
-        val tyrx = DiffieHellman().generateSecurityNumber(sessionInformation.ty,Integer.parseInt(userPin),sessionInformation.p)
-        key = Cipher().getKeyFromPassword(getString(tyrx), "77")
+        Log.e(">>>", "Pin usado para inicializar la key: ${Integer.parseInt(userPin)}")
+        val securityNumber = DiffieHellman().generateSecurityNumber(sessionInformation.ty,Integer.parseInt(userPin),sessionInformation.p)
+        key = Cipher().getKeyFromPassword(securityNumber.toString(), "77")
+        Log.e(">>>", "Key inicializada")
     }
 
     private fun updateCurrentTy(){
@@ -183,10 +212,12 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
                 if (it.data != null) {
                     val newTy = it.toObject(Session::class.java)!!.ty
                     sessionInformation.ty = newTy
-                    if(newTy!=0){
+                    Log.e(">>>","Se ha recibido el TY = $newTy")
+                    if(newTy!=0L){
                         initKey()
                         binding.sendMsgButton.isEnabled = true
                         binding.messageTextBox.isEnabled = true
+                        isTyZero == false
                     }
                 }else {
                     Toast.makeText(this, "El partner no existe", Toast.LENGTH_SHORT).show()
@@ -197,4 +228,5 @@ class ChatActivity : AppCompatActivity(), MessageAdapter.Listener {
     override fun onDecrypt(msgEncrypt:String):String{
         return Cipher().decrypt(msgEncrypt, key, iv)
     }
+
 }
